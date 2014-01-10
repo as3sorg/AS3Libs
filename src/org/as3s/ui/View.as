@@ -5,21 +5,13 @@ package org.as3s.ui
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.display.Shape;
-	import flash.display.Sprite;
-	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.filters.BitmapFilter;
-	import flash.filters.ColorMatrixFilter;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
-	import flash.geom.Rectangle;
 	
-	import flashx.textLayout.elements.BreakElement;
-	
-	import mx.controls.List;
-	
-	import org.as3s.tween.*;
+	import org.as3s.tween.TweenEquations;
+	import org.as3s.tween.TweenProxy;
 	
 	public class View extends MovieClip
 	{
@@ -394,16 +386,6 @@ package org.as3s.ui
 			
 			_tween = new TweenProxy(this, TweenEquations.easeOutQuad, 15);
 		}
-		
-//		protected function drawHitArea():void
-//		{
-//			if (_userInteractionEnabled) {
-//				_mask.graphics.clear();
-//				_mask.graphics.beginFill(0x000000);
-//				_mask.graphics.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-//				_mask.graphics.endFill();
-//			}
-//		}
 		
 		protected function drawMask():void
 		{
