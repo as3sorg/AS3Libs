@@ -268,8 +268,9 @@ package org.as3s.tween
 		
 		public override function cancel():void
 		{
-			Tween.remove(this);
-			_playing = false;
+//			Tween.remove(this);
+//			_playing = false;
+			reset();
 			super.cancel();
 		}
 		

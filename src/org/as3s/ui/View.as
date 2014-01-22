@@ -36,10 +36,24 @@ package org.as3s.ui
 		public function set left(value:Number):void
 		{
 			if (_left!=value) {
+				if (resizeSubViews) {
+					for (var i:int=0; i<numChildren; i++) {
+						if (getChildAt(i) is View) {
+							var subView:View = getChildAt(i) as View;
+							if (subView.autoResize) {
+								subView.x += (value-_left);
+							}
+						}
+					}
+				}
 				_left = value;
 				drawMask();
 				drawBackground();
 			}
+		}
+		public function get right():Number
+		{
+			return width+left;
 		}
 		
 		// top
@@ -51,11 +65,26 @@ package org.as3s.ui
 		public function set top(value:Number):void
 		{
 			if (_top!=value) {
+				if (resizeSubViews) {
+					for (var i:int=0; i<numChildren; i++) {
+						if (getChildAt(i) is View) {
+							var subView:View = getChildAt(i) as View;
+							if (subView.autoResize) {
+								subView.y += (value-_top);
+							}
+						}
+					}
+				}
 				_top = value;
 				drawMask();
 				drawBackground();
 			}
 		}
+		public function get bottom():Number
+		{
+			return height+top;
+		}
+
 		
 		// x
 		private var _x:Number = 0;
@@ -89,34 +118,37 @@ package org.as3s.ui
 		}
 		public override function set width(value:Number):void
 		{
-//			trace("View set width");
 			if (_width!=value) {
 				if (_width>0 && resizeSubViews) {
 					for (var i:int=0; i<numChildren; i++) {
 						if (getChildAt(i) is View) {
 							var subView:View = getChildAt(i) as View;
 							if (subView.autoResize) {
-								var r:Number = width-subView.x-subView.width;
 								var scale:Number;
+								var r:Number = right-(subView.x + subView.right);
+								var l:Number = (subView.x+subView.left)-left;
 								if (subView.autoResize & RESIZE_WIDTH) {
-									if (subView.autoResize & (RESIZE_LEFT_MARGIN | RESIZE_RIGHT_MARGIN)) {
+									if (subView.autoResize & RESIZE_LEFT_MARGIN && subView.autoResize & RESIZE_RIGHT_MARGIN) {
 										scale = value/width;
-										subView.x *= scale;
-										r *= scale;
+										subView.x = left + scale*(subView.x-left);
+									} else if (subView.autoResize & RESIZE_RIGHT_MARGIN) {
+										scale = (value-l)/(width-l);
+										subView.x = left + l - scale*subView.left;
 									} else if (subView.autoResize & RESIZE_LEFT_MARGIN) {
 										scale = (value-r)/(width-r);
-										subView.x *= scale;
-									} else if (subView.autoResize & RESIZE_RIGHT_MARGIN) {
-										scale = (value-subView.x)/(width-subView.x);
-										r *= scale;
+										subView.x = left + l*scale - scale*subView.left;
+									} else {
+										scale = (value-r-l)/(width-r-l);
+										subView.x = left + l - scale*subView.left;
 									}
-									subView.width = value-r-subView.x;
+									subView.left *= scale;
+									subView.width *= scale;
 								} else {
-									if (subView.autoResize & (RESIZE_LEFT_MARGIN | RESIZE_RIGHT_MARGIN)) {
+									if (subView.autoResize & RESIZE_LEFT_MARGIN && subView.autoResize & RESIZE_RIGHT_MARGIN) {
 										scale = (value-subView.width)/(width-subView.width);
-										subView.x *= scale;
+										subView.x = left + l*scale -subView.left;
 									} else if (subView.autoResize & RESIZE_LEFT_MARGIN) {
-										subView.x = value-r-subView.width;
+										subView.x = left + l - subView.left + (value-width);
 									}
 								}
 							}
@@ -137,34 +169,37 @@ package org.as3s.ui
 		}
 		public override function set height(value:Number):void
 		{
-//			trace("View set width");
 			if (_height!=value) {
 				if (_height>0 && resizeSubViews) {
 					for (var i:int=0; i<numChildren; i++) {
 						if (getChildAt(i) is View) {
 							var subView:View = getChildAt(i) as View;
 							if (subView.autoResize) {
-								var b:Number = height-subView.y-subView.height;
 								var scale:Number;
+								var b:Number = bottom-(subView.y + subView.bottom);
+								var t:Number = (subView.y+subView.top)-top;
 								if (subView.autoResize & RESIZE_HEIGHT) {
-									if (subView.autoResize & (RESIZE_TOP_MARGIN | RESIZE_BOTTOM_MARGIN)) {
+									if (subView.autoResize & RESIZE_TOP_MARGIN && subView.autoResize & RESIZE_BOTTOM_MARGIN) {
 										scale = value/height;
-										subView.y *= scale;
-										b *= scale;
-									} else if (subView.autoResize & RESIZE_TOP_MARGIN) {
-										scale = (value-b)/(width-b);
-										subView.y *= scale;
+										subView.y = top + scale*(subView.y-top);
 									} else if (subView.autoResize & RESIZE_BOTTOM_MARGIN) {
-										scale = (value-subView.y)/(height-subView.y);
-										b *= scale;
-									}
-									subView.height = value-b-subView.y;
-								} else {
-									if (subView.autoResize & (RESIZE_TOP_MARGIN | RESIZE_BOTTOM_MARGIN)) {
-										scale = (value-subView.height)/(height-subView.height);
-										subView.y *= scale;
+										scale = (value-t)/(height-t);
+										subView.y = top + t - scale*subView.top;
 									} else if (subView.autoResize & RESIZE_TOP_MARGIN) {
-										subView.y = value-b-subView.height;
+										scale = (value-b)/(height-b);
+										subView.y = top + t*scale - scale*subView.top;
+									} else {
+										scale = (value-b-t)/(height-b-t);
+										subView.y = top + t - scale*subView.top;
+									}
+									subView.top *= scale;
+									subView.height *= scale;
+								} else {
+									if (subView.autoResize & RESIZE_TOP_MARGIN && subView.autoResize & RESIZE_BOTTOM_MARGIN) {
+										scale = (value-subView.height)/(height-subView.height);
+										subView.y = top + t*scale -subView.top;
+									} else if (subView.autoResize & RESIZE_TOP_MARGIN) {
+										subView.y = top + t - subView.top + (value-height);
 									}
 								}
 							}
@@ -175,7 +210,7 @@ package org.as3s.ui
 				drawMask();
 				drawBackground();
 			}
-		}		
+		}
 		
 		// fade
 		private var _fade:Number = 1.0;

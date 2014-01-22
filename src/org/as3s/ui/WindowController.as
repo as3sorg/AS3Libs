@@ -42,6 +42,10 @@ package org.as3s.ui
 				}
 			}
 		}
+		public function get screens():Array
+		{
+			return Screen.screens;
+		}
 		
 		public function WindowController(window:NativeWindow=null, options:NativeWindowInitOptions=null)
 		{

@@ -21,6 +21,13 @@ package org.as3s.tween
 		public function ParallelTween(...args)
 		{
 			_list = args;
+//			var i:int = list.length;
+//			while(i--) {
+//				var tween:Tween = list[i];
+//				tween.addEventListener(Event.COMPLETE, complete);
+//				tween.addEventListener(Event.CANCEL, cancelled);
+//			}
+
 			super(this, null);
 		}
 		

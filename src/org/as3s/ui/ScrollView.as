@@ -173,6 +173,25 @@ package org.as3s.ui
 			super.y = _y - _scrollY;
 		}
 		
+		private var _lockVertical:Boolean = true;
+		public function get lockVertical():Boolean
+		{
+			return _lockVertical;
+		}
+		public function set lockVertical(value:Boolean):void
+		{
+			_lockVertical = value;
+		}
+		
+		private var _lockHorizontal:Boolean = true;
+		public function get lockHorizontal():Boolean
+		{
+			return _lockHorizontal;
+		}
+		public function set lockHorizontal(value:Boolean):void
+		{
+			_lockHorizontal = value;
+		}
 		
 		private var _bounceVertical:Boolean = true;
 		public function get bounceVertical():Boolean
@@ -375,12 +394,12 @@ package org.as3s.ui
 			_mouseX = parent.mouseX;
 			_mouseY = parent.mouseY;
 			scrollX -= _mouseDeltaX/zoom;
-			if (!bounceHorizontal) {
+			if (!bounceHorizontal && lockHorizontal) {
 				if (scrollX<0) scrollX = 0;
 				else if (scrollX>contentWidth-width) scrollX = contentWidth-width;
 			}
 			scrollY -= _mouseDeltaY/zoom;
-			if (!bounceVertical) {
+			if (!bounceVertical && lockVertical) {
 				if (scrollY<0) scrollY = 0;
 				else if (scrollY>contentHeight-height) scrollY = contentHeight-height;
 			}
@@ -395,6 +414,7 @@ package org.as3s.ui
 		private function checkBounce(e:Event):void
 		{
 			if (mousePressed) return;
+			
 			var l:Number = left/zoom+scrollX;
 			var w:Number = width/zoom;
 			var marginLeft:Number = 0-l;
@@ -406,6 +426,7 @@ package org.as3s.ui
 			} else if (marginRight>0) {
 				_mouseDeltaX = marginRight*0.1;
 			}
+			
 			var t:Number = top/zoom+scrollY;
 			var h:Number = height/zoom;
 			var marginTop:Number = 0-t;
@@ -417,21 +438,26 @@ package org.as3s.ui
 			} else if (marginBottom>0) {
 				_mouseDeltaY = marginBottom*0.1;
 			}
+			
 			if (_mouseDeltaX>-deltaThreshold && _mouseDeltaX<deltaThreshold && _mouseDeltaY>-deltaThreshold && _mouseDeltaY<deltaThreshold) {
 				removeEventListener(Event.ENTER_FRAME, checkBounce);
 			} else {
 				_mouseDeltaX *=0.95;
 				_mouseDeltaY *=0.95;		
 			}
-			scrollX -= _mouseDeltaX;
-			if (!bounceHorizontal) {
-				if (scrollX<0) scrollX = 0;
-				else if (scrollX>contentWidth-width) scrollX = contentWidth-width;
+			if (lockHorizontal) {
+				scrollX -= _mouseDeltaX;
+				if (!bounceHorizontal) {
+					if (scrollX<0) scrollX = 0;
+					else if (scrollX>contentWidth-width) scrollX = contentWidth-width;
+				}
 			}
-			scrollY -= _mouseDeltaY;
-			if (!bounceVertical) {
-				if (scrollY<0) scrollY = 0;
-				else if (scrollY>contentHeight-height) scrollY = contentHeight-height;
+			if (lockVertical) {
+				scrollY -= _mouseDeltaY;
+				if (!bounceVertical) {
+					if (scrollY<0) scrollY = 0;
+					else if (scrollY>contentHeight-height) scrollY = contentHeight-height;
+				}
 			}
 		}
 		
